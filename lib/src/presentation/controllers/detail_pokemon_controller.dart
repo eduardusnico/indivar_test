@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
+import 'package:indivar_test/src/presentation/controllers/my_pokemon_controller.dart';
 import 'package:indivar_test/src/utils/extensions/app_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -10,6 +11,7 @@ import '../../data/data_sources/remote/home_data_source.dart';
 import '../../data/repositories/home_repository_impl.dart';
 import '../../domain/models/empty_models.dart';
 import '../../domain/models/m_pokemon_detail.dart';
+import '../../domain/models/m_pokemon_mini_detail.dart';
 import '../../domain/models/m_pokemon_sprite.dart';
 
 class DetailPokemonController extends GetxController {
@@ -21,6 +23,7 @@ class DetailPokemonController extends GetxController {
 
   final isLoadingDetail = false.obs;
   final pokemonId = 0.obs;
+  final isCatchable = true.obs;
 
   final pokemonDetail = PokemonDetail(
     id: 0,
@@ -37,7 +40,10 @@ class DetailPokemonController extends GetxController {
   void onInit() async {
     // TODO: implement onInit
     super.onInit();
-    pokemonId.value = Get.arguments;
+    final args = Get.arguments;
+    pokemonId.value = args["id"];
+    isCatchable.value = args["catchable"] ?? true;
+
     _dio = Dio();
     _prefs = await SharedPreferences.getInstance();
     setup(_dio, _prefs);
@@ -67,24 +73,51 @@ class DetailPokemonController extends GetxController {
     } else {
       AppDialog.tryCatchPokemon(
         topButtonPressed: () {
-          final success = _generateRandomBoolean();
-          if (success == true) {
-            AppDialog.successCatchPokemon();
-            _addPokemonToPrefs(pokemonId);
-          } else {
-            AppDialog.failedCatchPokemon();
-          }
+          sureToCatchPokemon(pokemonId);
         },
       );
     }
   }
 
+  void sureToCatchPokemon(int pokemonId) {
+    final success = _generateRandomBoolean();
+    if (success == true) {
+      Get.back();
+      AppDialog.successCatchPokemon();
+      _addPokemonToPrefs(pokemonId);
+      _updateMyPokemonList();
+    } else {
+      Get.back();
+      AppDialog.failedCatchPokemon();
+    }
+  }
+
+  void _updateMyPokemonList() {
+    final mpC = Get.find<MyPokemonController>();
+    mpC.getMyPokemonList();
+  }
+
   void _addPokemonToPrefs(int pokemonId) {
-    _prefs.setBool('pokemon_$pokemonId', true);
+    final String myPokemonJson = _prefs.getString('my_pokemon') ?? "[]";
+    final myPokemonList = pokemonMiniDetailFromJson(myPokemonJson);
+    myPokemonList.add(
+      PokemonMiniDetail(
+          name: pokemonDetail.value.name,
+          url: 'https://pokeapi.co/api/v2/pokemon/$pokemonId',
+          id: pokemonId),
+    );
+    final myNewPokemonJson = pokemonMiniDetailToJson(myPokemonList);
+    _prefs.setString('my_pokemon', myNewPokemonJson);
   }
 
   bool isPokemonOwned(int pokemonId) {
-    return _prefs.getBool('pokemon_$pokemonId') ?? false;
+    final String myPokemonJson = _prefs.getString('my_pokemon') ?? "[]";
+    final myPokemonList = pokemonMiniDetailFromJson(myPokemonJson);
+    final isOwned =
+        myPokemonList.indexWhere((element) => element.id == pokemonId) == -1
+            ? false
+            : true;
+    return isOwned;
   }
 
   bool _generateRandomBoolean() {

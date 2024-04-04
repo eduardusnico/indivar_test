@@ -6,10 +6,10 @@ import 'package:indivar_test/src/utils/constants/app_constants.dart';
 import 'package:indivar_test/src/utils/constants/app_padding.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
-class PokemonDetailScreen extends StatelessWidget {
+class DetailPokemonScreen extends StatelessWidget {
   final _dpController = Get.find<DetailPokemonController>();
-  final bool isOwned;
-  PokemonDetailScreen({super.key, this.isOwned = false});
+  final bool isCatchable;
+  DetailPokemonScreen({super.key, this.isCatchable = true});
 
   @override
   Widget build(BuildContext context) {
@@ -236,13 +236,15 @@ class PokemonDetailScreen extends StatelessWidget {
                 ]),
         ),
       ),
-      floatingActionButton: ElevatedButton.icon(
-        onPressed: () {
-          _dpController.catchPokemon(_dpController.pokemonId.value);
-        },
-        icon: const Icon(Icons.circle),
-        label: const Text('Catch'),
-      ),
+      floatingActionButton: _dpController.isCatchable.isFalse
+          ? null
+          : ElevatedButton.icon(
+              onPressed: () {
+                _dpController.catchPokemon(_dpController.pokemonId.value);
+              },
+              icon: const Icon(Icons.circle),
+              label: const Text('Catch'),
+            ),
     );
   }
 }

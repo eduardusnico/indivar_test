@@ -3,7 +3,7 @@ import 'package:indivar_test/src/config/router/routes_name.dart';
 import 'package:indivar_test/src/presentation/bindings/detail_pokemon_binding.dart';
 import 'package:indivar_test/src/presentation/bindings/home_binding.dart';
 import 'package:indivar_test/src/presentation/views/home_screen.dart';
-import 'package:indivar_test/src/presentation/views/pokemon_detail_screen.dart';
+import 'package:indivar_test/src/presentation/views/detail_pokemon_screen.dart';
 
 class AppRoutes {
   static final route = [
@@ -14,7 +14,7 @@ class AppRoutes {
     ),
     GetPage(
       name: AppRoutesName.detail,
-      page: () => PokemonDetailScreen(),
+      page: () => DetailPokemonScreen(),
       binding: DetailPokemonBinding(),
     ),
   ];

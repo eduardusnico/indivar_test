@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'm_secondary_detail.dart';
+import 'package:indivar_test/src/domain/models/m_pokemon_mini_detail.dart';
 
 RespPokemonList respPokemonListFromJson(String str) =>
     RespPokemonList.fromJson(json.decode(str));
@@ -11,7 +11,7 @@ class RespPokemonList {
   int count;
   String next;
   String previous;
-  List<SecondaryDetail> pokemons;
+  List<PokemonMiniDetail> pokemons;
 
   RespPokemonList({
     required this.count,
@@ -25,8 +25,8 @@ class RespPokemonList {
         count: json["count"],
         next: json["next"],
         previous: json["previous"],
-        pokemons: List<SecondaryDetail>.from(
-            json["results"].map((x) => SecondaryDetail.fromJson(x))),
+        pokemons: List<PokemonMiniDetail>.from(
+            json["results"].map((x) => PokemonMiniDetail.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {

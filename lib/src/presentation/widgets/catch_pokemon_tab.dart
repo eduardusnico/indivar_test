@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:indivar_test/src/config/router/routes_name.dart';
 import 'package:indivar_test/src/presentation/controllers/home_controller.dart';
-import 'package:indivar_test/src/presentation/views/pokemon_detail_screen.dart';
 import 'package:indivar_test/src/utils/constants/app_padding.dart';
 
 import '../../utils/constants/app_constants.dart';
@@ -25,8 +24,9 @@ class CatchPokemonTab extends StatelessWidget {
               itemCount: _hController.pokemonList.length,
               itemBuilder: (context, i) {
                 return InkWell(
-                  onTap: () => Get.toNamed(AppRoutesName.detail,
-                      arguments: _hController.pokemonIdList[i]),
+                  onTap: () => Get.toNamed(AppRoutesName.detail, arguments: {
+                    "id": _hController.pokemonList[i].id,
+                  }),
                   child: Card(
                     color: const Color.fromARGB(255, 191, 88, 88),
                     child: Padding(
@@ -39,7 +39,7 @@ class CatchPokemonTab extends StatelessWidget {
                             color: Colors.white,
                           ),
                           child: Image.network(
-                            'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${_hController.pokemonIdList[i]}.png',
+                            'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${_hController.pokemonList[i].id}.png',
                             cacheHeight: 96,
                             cacheWidth: 96,
                           ),
