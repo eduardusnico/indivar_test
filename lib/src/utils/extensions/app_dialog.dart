@@ -8,12 +8,15 @@ import '../constants/app_padding.dart';
 
 //TODO add ontap
 class AppDialog {
-  static tryCatchPokemon() {
+  static tryCatchPokemon(
+      {VoidCallback? topButtonPressed, VoidCallback? bottomButtonPressed}) {
     CustomAppDialog.withTwoButton(
       icon: Icons.question_mark,
       content: 'Are you sure want to catch this pokemon?',
       topButtonText: 'OK',
+      topButtonPressed: topButtonPressed,
       bottomButtonText: 'Cancel',
+      bottomButtonPressed: bottomButtonPressed,
     );
   }
 
@@ -41,12 +44,15 @@ class AppDialog {
     );
   }
 
-  static releasePokemon() {
+  static releasePokemon(
+      {VoidCallback? topButtonPressed, VoidCallback? bottomButtonPressed}) {
     CustomAppDialog.withTwoButton(
       icon: Icons.question_mark,
       content: 'Are you sure want to release this pokemon?',
       topButtonText: 'OK',
+      topButtonPressed: topButtonPressed,
       bottomButtonText: 'Cancel',
+      bottomButtonPressed: bottomButtonPressed,
     );
   }
 }

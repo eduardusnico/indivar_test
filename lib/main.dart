@@ -33,11 +33,11 @@ class MyApp extends StatelessWidget {
         GetPage(
             name: AppRoutesName.home,
             binding: HomeBinding(),
-            page: () => const CatchPokemonTab()),
+            page: () => HomeScreen()),
         GetPage(
             name: AppRoutesName.detail,
             binding: DetailPokemonBinding(),
-            page: () => const PokemonDetailScreen())
+            page: () => PokemonDetailScreen())
       ],
       initialRoute: "/",
     );

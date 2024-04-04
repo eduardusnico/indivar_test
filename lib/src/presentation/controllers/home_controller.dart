@@ -12,8 +12,9 @@ class HomeController extends GetxController {
   late final SharedPreferences _prefs;
   late final Dio _dio;
 
-  final _isLoadingList = false.obs;
-  final _pokemonList = <SecondaryDetail>[].obs;
+  final isLoadingList = false.obs;
+  final pokemonList = <SecondaryDetail>[].obs;
+  final pokemonIdList = <int>[].obs;
 
   @override
   void onInit() async {
@@ -22,6 +23,7 @@ class HomeController extends GetxController {
     _dio = Dio();
     _prefs = await SharedPreferences.getInstance();
     setup(_dio, _prefs);
+    getPokemonList(20, 20);
   }
 
   void setup(Dio dio, SharedPreferences prefs) {
@@ -31,10 +33,21 @@ class HomeController extends GetxController {
   }
 
   void changeLoading(bool loading) {
-    _isLoadingList.value = loading;
+    isLoadingList.value = loading;
+  }
+
+  int getPokemonIdFromUrl(String url) {
+    return int.parse(url.substring(url.length - 3, url.length - 1));
   }
 
   void getPokemonList(int offset, int limit) async {
-    _pokemonList.value = await _repository.getPokemonList(offset, limit);
+    changeLoading(true);
+    pokemonList.value = await _repository.getPokemonList(offset, limit);
+    List<int> tempPokemonIdList = [];
+    for (int i = 0; i < pokemonList.length; i++) {
+      tempPokemonIdList.add(getPokemonIdFromUrl(pokemonList[i].url));
+    }
+    pokemonIdList.assignAll(tempPokemonIdList);
+    changeLoading(false);
   }
 }

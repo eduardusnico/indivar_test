@@ -9,12 +9,12 @@ class AppRoutes {
   static final route = [
     GetPage(
       name: AppRoutesName.home,
-      page: () => const CatchPokemonTab(),
+      page: () => HomeScreen(),
       binding: HomeBinding(),
     ),
     GetPage(
       name: AppRoutesName.detail,
-      page: () => const PokemonDetailScreen(),
+      page: () => PokemonDetailScreen(),
       binding: DetailPokemonBinding(),
     ),
   ];

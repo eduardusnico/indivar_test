@@ -17,23 +17,12 @@ class DetailPokemonController extends GetxController {
   late final SharedPreferences _prefs;
   late final Dio _dio;
 
-  @override
-  void onInit() async {
-    // TODO: implement onInit
-    super.onInit();
-    _dio = Dio();
-    _prefs = await SharedPreferences.getInstance();
-    setup(_dio, _prefs);
-  }
+  final maxStatValue = 300;
 
-  void setup(Dio dio, SharedPreferences prefs) {
-    final HomeDataSourceLocal dataSourceLocal = HomeDataSourceLocal(_prefs);
-    final HomeDataSourceRemote dataSourceRemote = HomeDataSourceRemote(dio);
-    _repository = HomeRepositoryImpl(dataSourceLocal, dataSourceRemote);
-  }
+  final isLoadingDetail = false.obs;
+  final pokemonId = 0.obs;
 
-  final _isLoadingDetail = false.obs;
-  final _pokemonDetail = PokemonDetail(
+  final pokemonDetail = PokemonDetail(
     id: 0,
     name: '',
     height: 0,
@@ -44,26 +33,49 @@ class DetailPokemonController extends GetxController {
     types: [],
   ).obs;
 
+  @override
+  void onInit() async {
+    // TODO: implement onInit
+    super.onInit();
+    pokemonId.value = Get.arguments;
+    _dio = Dio();
+    _prefs = await SharedPreferences.getInstance();
+    setup(_dio, _prefs);
+    getPokemonDetail(pokemonId.value);
+  }
+
+  void setup(Dio dio, SharedPreferences prefs) {
+    final HomeDataSourceLocal dataSourceLocal = HomeDataSourceLocal(_prefs);
+    final HomeDataSourceRemote dataSourceRemote = HomeDataSourceRemote(dio);
+    _repository = HomeRepositoryImpl(dataSourceLocal, dataSourceRemote);
+  }
+
   void changeLoading(bool loading) {
-    _isLoadingDetail.value = loading;
+    isLoadingDetail.value = loading;
   }
 
   void getPokemonDetail(int id) async {
-    _pokemonDetail.value =
+    changeLoading(true);
+    pokemonDetail.value =
         await _repository.getPokemonDetail(id) ?? kEmptyPokemonDetail;
+    changeLoading(false);
   }
 
   void catchPokemon(int pokemonId) async {
     if (isPokemonOwned(pokemonId) == true) {
       AppDialog.alreadyOwnPokemon();
     } else {
-      final success = _generateRandomBoolean();
-      if (success == true) {
-        AppDialog.successCatchPokemon();
-        _addPokemonToPrefs(pokemonId);
-      } else {
-        AppDialog.failedCatchPokemon();
-      }
+      AppDialog.tryCatchPokemon(
+        topButtonPressed: () {
+          final success = _generateRandomBoolean();
+          if (success == true) {
+            AppDialog.successCatchPokemon();
+            _addPokemonToPrefs(pokemonId);
+          } else {
+            AppDialog.failedCatchPokemon();
+          }
+        },
+      );
     }
   }
 
