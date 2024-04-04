@@ -1,26 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:indivar_test/src/presentation/views/pokemon_detail_screen.dart';
 import 'package:indivar_test/src/utils/constants/app_padding.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+import '../../utils/constants/app_constants.dart';
+
+class CatchPokemonTab extends StatelessWidget {
+  const CatchPokemonTab({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Scaffold(
-          body: SafeArea(
-            child: GridView.builder(
-              padding: kPaddingAll8,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                childAspectRatio: 0.8,
-                crossAxisCount: 2,
-              ),
-              itemCount: 5,
-              itemBuilder: (context, index) {
-                return Card(
+    return Scaffold(
+        body: SafeArea(
+          child: GridView.builder(
+            padding: kInsetsAll8,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              childAspectRatio: 0.8,
+              crossAxisCount: 2,
+            ),
+            itemCount: 5,
+            itemBuilder: (context, index) {
+              return InkWell(
+                onTap: () => Get.to(() => const PokemonDetailScreen()),
+                child: Card(
                   color: const Color.fromARGB(255, 191, 88, 88),
                   child: Padding(
-                    padding: kPaddingAll12,
+                    padding: kInsetsAll12,
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
                       Container(
                         width: double.infinity,
@@ -34,24 +39,32 @@ class HomeScreen extends StatelessWidget {
                           cacheWidth: 96,
                         ),
                       ),
+                      SizedBox(
+                        height: Get.height * 0.02,
+                      ),
                       const Text(
-                        'Venusaur',
-                        style: TextStyle(color: Colors.white),
+                        'Ivysaur',
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Colors.white,
+                          fontFamily: poppins,
+                          fontWeight: FontWeight.w500,
+                        ),
                       )
                     ]),
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
-          bottomNavigationBar: BottomNavigationBar(
-            items: const [
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.people), label: 'Catch Pokemon'),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.circle), label: 'My Pokemon')
-            ],
-          )),
-    );
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          items: const [
+            BottomNavigationBarItem(
+                icon: Icon(Icons.people), label: 'Catch Pokemon'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.circle), label: 'My Pokemon')
+          ],
+        ));
   }
 }
