@@ -5,7 +5,11 @@ class HomeDataSourceLocal {
 
   HomeDataSourceLocal(this.prefs);
 
-  Future<void> getPokemonListFromCache(int offset, int limit) async {}
+  void setJsonByKey(String key, String value) {
+    prefs.setString(key, value);
+  }
 
-  Future<void> getPokemonDetailFromCache(int id) async {}
+  String? getJsonByKey(String key) {
+    return prefs.getString(key);
+  }
 }

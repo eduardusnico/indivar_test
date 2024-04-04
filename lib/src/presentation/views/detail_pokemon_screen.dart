@@ -239,11 +239,25 @@ class DetailPokemonScreen extends StatelessWidget {
       floatingActionButton: _dpController.isCatchable.isFalse
           ? null
           : ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20))),
               onPressed: () {
                 _dpController.catchPokemon(_dpController.pokemonId.value);
               },
-              icon: const Icon(Icons.circle),
-              label: const Text('Catch'),
+              icon: Image.asset(
+                'assets/images/icon_ball.png',
+                height: 20,
+                color: Colors.white,
+                width: 20,
+              ),
+              label: const Text('Catch',
+                  style: TextStyle(
+                    letterSpacing: 1,
+                    fontFamily: poppins,
+                  )),
             ),
     );
   }

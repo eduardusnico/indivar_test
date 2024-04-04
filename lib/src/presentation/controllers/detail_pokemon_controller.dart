@@ -11,7 +11,6 @@ import '../../data/data_sources/remote/home_data_source.dart';
 import '../../data/repositories/home_repository_impl.dart';
 import '../../domain/models/empty_models.dart';
 import '../../domain/models/m_pokemon_detail.dart';
-import '../../domain/models/m_pokemon_mini_detail.dart';
 import '../../domain/models/m_pokemon_sprite.dart';
 
 class DetailPokemonController extends GetxController {
@@ -46,45 +45,49 @@ class DetailPokemonController extends GetxController {
 
     _dio = Dio();
     _prefs = await SharedPreferences.getInstance();
-    setup(_dio, _prefs);
-    getPokemonDetail(pokemonId.value);
+    _setup(_dio, _prefs);
+    _getPokemonDetail(pokemonId.value);
   }
 
-  void setup(Dio dio, SharedPreferences prefs) {
+  void _setup(Dio dio, SharedPreferences prefs) {
     final HomeDataSourceLocal dataSourceLocal = HomeDataSourceLocal(_prefs);
     final HomeDataSourceRemote dataSourceRemote = HomeDataSourceRemote(dio);
-    _repository = HomeRepositoryImpl(dataSourceLocal, dataSourceRemote);
+    _repository = HomeRepositoryImpl(
+        dataSourceLocal: dataSourceLocal, dataSourceRemote: dataSourceRemote);
   }
 
-  void changeLoading(bool loading) {
+  void _changeLoading(bool loading) {
     isLoadingDetail.value = loading;
   }
 
-  void getPokemonDetail(int id) async {
-    changeLoading(true);
-    pokemonDetail.value =
-        await _repository.getPokemonDetail(id) ?? kEmptyPokemonDetail;
-    changeLoading(false);
+  void _getPokemonDetail(int id) async {
+    _changeLoading(true);
+    if (_isPokemonDetailExistInCache(id) == true) {
+      _getPokemonDetailFromCache(id);
+    } else {
+      _getPokemonDetailFromAPI(id);
+    }
+    _changeLoading(false);
   }
 
   void catchPokemon(int pokemonId) async {
-    if (isPokemonOwned(pokemonId) == true) {
+    if (_isPokemonOwned(pokemonId) == true) {
       AppDialog.alreadyOwnPokemon();
     } else {
       AppDialog.tryCatchPokemon(
         topButtonPressed: () {
-          sureToCatchPokemon(pokemonId);
+          _sureToCatchPokemon(pokemonId);
         },
       );
     }
   }
 
-  void sureToCatchPokemon(int pokemonId) {
+  void _sureToCatchPokemon(int pokemonId) {
     final success = _generateRandomBoolean();
     if (success == true) {
       Get.back();
       AppDialog.successCatchPokemon();
-      _addPokemonToPrefs(pokemonId);
+      _addPokemonToMyPokemon(pokemonId);
       _updateMyPokemonList();
     } else {
       Get.back();
@@ -97,32 +100,39 @@ class DetailPokemonController extends GetxController {
     mpC.getMyPokemonList();
   }
 
-  void _addPokemonToPrefs(int pokemonId) {
-    final String myPokemonJson = _prefs.getString('my_pokemon') ?? "[]";
-    final myPokemonList = pokemonMiniDetailFromJson(myPokemonJson);
-    myPokemonList.add(
-      PokemonMiniDetail(
-          name: pokemonDetail.value.name,
-          url: 'https://pokeapi.co/api/v2/pokemon/$pokemonId',
-          id: pokemonId),
-    );
-    final myNewPokemonJson = pokemonMiniDetailToJson(myPokemonList);
-    _prefs.setString('my_pokemon', myNewPokemonJson);
+  void _addPokemonToMyPokemon(int pokemonId) {
+    _repository.addPokemonToMyPokemon(
+        'my_pokemon', pokemonId, pokemonDetail.value.name);
   }
 
-  bool isPokemonOwned(int pokemonId) {
-    final String myPokemonJson = _prefs.getString('my_pokemon') ?? "[]";
-    final myPokemonList = pokemonMiniDetailFromJson(myPokemonJson);
-    final isOwned =
-        myPokemonList.indexWhere((element) => element.id == pokemonId) == -1
-            ? false
-            : true;
-    return isOwned;
+  bool _isPokemonOwned(int pokemonId) {
+    return _repository.isPokemonOwned('my_pokemon', pokemonId);
   }
 
   bool _generateRandomBoolean() {
     final random = Random();
     final newValue = random.nextBool();
     return newValue;
+  }
+
+  void _getPokemonDetailFromAPI(int id) async {
+    final data = await _repository.getPokemonDetail(id) ?? kEmptyPokemonDetail;
+    final json = pokemonDetailToJson(data);
+    _savePokemonDetailToCache(id, json);
+    pokemonDetail.value = data;
+  }
+
+  void _savePokemonDetailToCache(int pokemonId, String json) {
+    _repository.saveJsonAsCache('pokemon_$pokemonId', json);
+  }
+
+  bool _isPokemonDetailExistInCache(int pokemonId) {
+    return _repository.checkExistedKey('pokemon_$pokemonId');
+  }
+
+  void _getPokemonDetailFromCache(int pokemonId) {
+    final data =
+        _repository.getPokemonDetailFromCache('pokemon_$pokemonId', pokemonId);
+    pokemonDetail.value = data;
   }
 }

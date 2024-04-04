@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:indivar_test/src/presentation/widgets/my_pokemon_tab.dart';
+import 'package:indivar_test/src/utils/constants/app_colors.dart';
 
 import '../widgets/catch_pokemon_tab.dart';
 
@@ -17,15 +18,28 @@ class HomeScreen extends StatelessWidget {
         ),
         bottomNavigationBar: Obx(
           () => BottomNavigationBar(
+            selectedItemColor: kMaroon,
             onTap: (value) {
               index.value = value;
             },
             currentIndex: index.value,
-            items: const [
+            items: [
               BottomNavigationBarItem(
-                  icon: Icon(Icons.people), label: 'Catch Pokemon'),
+                  icon: Image.asset(
+                    'assets/images/icon_catch.png',
+                    height: 20,
+                    width: 20,
+                    color: index.value == 0 ? kMaroon : kCloud,
+                  ),
+                  label: 'Catch Pokemon'),
               BottomNavigationBarItem(
-                  icon: Icon(Icons.circle), label: 'My Pokemon')
+                  icon: Image.asset(
+                    'assets/images/icon_ball.png',
+                    height: 20,
+                    width: 20,
+                    color: index.value == 1 ? kMaroon : kCloud,
+                  ),
+                  label: 'My Pokemon')
             ],
           ),
         ));
